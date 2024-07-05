@@ -43,36 +43,59 @@ public class URLBuilder {
         String jsonString = restTemplate.getForObject(uri, String.class);
 
         // JSON 유효성 검사 추가
-        if (jsonString == null || jsonString.trim().isEmpty() || jsonString.charAt(0) != '{') {
+        if (jsonString == null || jsonString.trim().isEmpty() || (jsonString.charAt(0) != '{' && jsonString.charAt(0) != '[')) {
             throw new RuntimeException("Invalid response received: " + jsonString);
         }
 
         JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject;
+        Object json;
         try {
-            jsonObject = (JSONObject) jsonParser.parse(jsonString);
+            json = jsonParser.parse(jsonString);
         } catch (ParseException e) {
             throw new RuntimeException("Error parsing JSON response: " + e.getMessage());
         }
 
-        JSONObject jsonResponse = (JSONObject) jsonObject.get("response");
-
-        Long pageNo = (Long) jsonResponse.get("pageNo");
-        Long pageSize = (Long) jsonResponse.get("pageSize");
-
-        JSONObject jsonPageRes = new JSONObject();
-        jsonPageRes.put("pageNo", pageNo);
-        jsonPageRes.put("pageSize", pageSize);
-
-        JSONArray libsArray = (JSONArray) jsonResponse.get("libs");
-        List<JSONObject> libList = new ArrayList<>();
-        libList.add(jsonPageRes);
-        for (int i = 0; i < libsArray.size(); i++) {
-            JSONObject libObject = (JSONObject) libsArray.get(i);
-            JSONObject libDetails = (JSONObject) libObject.get("lib");
-            libList.add(libDetails);
+        // JSON 구조에 따른 처리
+        List<JSONObject> resultList = new ArrayList<>();
+        if (json instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject) json;
+            resultList.addAll(parseJsonObject(jsonObject));
+        } else if (json instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray) json;
+            for (Object obj : jsonArray) {
+                if (obj instanceof JSONObject) {
+                    resultList.addAll(parseJsonObject((JSONObject) obj));
+                }
+            }
         }
 
-        return libList.isEmpty() ? Collections.emptyList() : libList;
+        return resultList.isEmpty() ? Collections.emptyList() : resultList;
+    }
+
+    private static List<JSONObject> parseJsonObject(JSONObject jsonObject) {
+        List<JSONObject> resultList = new ArrayList<>();
+
+        // JSON 구조를 동적으로 탐색하여 데이터 추출
+        for (Object key : jsonObject.keySet()) {
+            Object value = jsonObject.get(key);
+
+            if (value instanceof JSONObject) {
+                resultList.add((JSONObject) value);
+            } else if (value instanceof JSONArray) {
+                JSONArray jsonArray = (JSONArray) value;
+                for (Object obj : jsonArray) {
+                    if (obj instanceof JSONObject) {
+                        resultList.add((JSONObject) obj);
+                    }
+                }
+            } else {
+                // 필요한 경우 다른 타입의 데이터 처리
+                JSONObject singleItem = new JSONObject();
+                singleItem.put(key, value);
+                resultList.add(singleItem);
+            }
+        }
+
+        return resultList;
     }
 }
