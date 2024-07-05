@@ -8,7 +8,7 @@ public class LibApi {
     public enum EndPoint{
         LIBSRCH("/libSrch"),
         ITEMSRCH("/itemSrch"),
-        LOANITEMSRCH("/loanitemSrch"),
+        LOANITEMSRCH("/loanItemSrch"),
         RECOMMANDLIST("/recommandList"),
         SRCHDTLLIST("srchDtlList"),
         USAGEANALYSISLIST("/usageAnalysisList"),
@@ -20,7 +20,8 @@ public class LibApi {
         EXTENDLIBSRCH("/extends/libSrch"),
         EXTENDLOANITEMSRCHBYLIB("extends/loanItemSrchByLib"),
         SRCHBOOKS("/srchBooks"),
-        READQT("/readQt");
+        READQT("/readQt"),
+        MONTHLYKEYWORDS("/monthlyKeywords");
 
 
 
