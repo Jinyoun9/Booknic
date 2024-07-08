@@ -2,12 +2,17 @@ package com.booknic.controller;
 
 import static com.booknic.api.LibApi.EndPoint.*;
 
+import com.booknic.entity.User;
+import com.booknic.repository.UserRepository;
 import com.booknic.service.LibraryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +21,8 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class LibraryController {
-
+    @Autowired
+    UserRepository userRepository;
     @GetMapping("/lib")
     public ResponseEntity<?> getLibrary(@RequestParam Map<String, String> params) throws URISyntaxException {
 
@@ -101,16 +107,23 @@ public class LibraryController {
         List<?> libInfo = LibraryService.getLibInfo(params, SRCHBOOKS.getEndPoint());
         return ResponseEntity.ok().body(libInfo);
     }
-    @GetMapping("/readQt")
-    public ResponseEntity<?> getReadQt (@RequestParam Map<String, String> params) throws URISyntaxException {
-
-        List<?> libInfo = LibraryService.getLibInfo(params, READQT.getEndPoint());
-        return ResponseEntity.ok().body(libInfo);
-    }
     @GetMapping("/keyword")
     public ResponseEntity<?> getKeyword(@RequestParam Map<String, String> params) throws URISyntaxException {
 
         List<?> libInfo = LibraryService.getLibInfo(params, MONTHLYKEYWORDS.getEndPoint());
         return ResponseEntity.ok().body(libInfo);
+    }
+    @GetMapping("/scan")
+    public ResponseEntity<?> getUserLikeScannedBook(@RequestParam Map<String, String> params) throws URISyntaxException {
+        String encodedBookname = params.get("bookname");
+        String decodedBookname;
+        try {
+            decodedBookname = URLDecoder.decode(encodedBookname, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return ResponseEntity.badRequest().body("Failed to decode bookname");
+        }
+        List<User> userList = userRepository.findUsersByBookname(decodedBookname);
+
+        return ResponseEntity.ok(userList);
     }
 }
