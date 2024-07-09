@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-
 public class JwtAuthInfoHoldInterceptor implements AuthInfoHoldInterceptor{
     private final JwtProvider jwtProvider;
     @Override

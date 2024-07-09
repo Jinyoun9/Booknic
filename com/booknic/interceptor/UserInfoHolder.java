@@ -5,6 +5,7 @@ import com.booknic.entity.User;
 public class UserInfoHolder {
     private static final ThreadLocal<User> userInfo = new ThreadLocal<>();
     public static void setUserInfo(User user) {
+
         userInfo.set(user);
     }
 
