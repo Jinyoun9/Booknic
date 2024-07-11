@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@RequestMapping("/api")
+@RequestMapping("/auth")
 @RestController
+@CrossOrigin(origins = "https://localhost:3000")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -36,8 +37,9 @@ public class AuthController {
         String id = params.get("id");
         String password = params.get("password");
         if(authService.login(id, password)){
-            return ResponseEntity.status(HttpStatus.FOUND).build();
+            return ResponseEntity.ok().build(); // 로그인 성공 시 200 OK 반환
         }
-        return ResponseEntity.ok("false");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("false"); // 로그인 실패 시 401 Unauthorized 반환
     }
+
 }

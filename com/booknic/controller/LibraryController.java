@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://localhost:3000")
 @RequiredArgsConstructor
 public class LibraryController {
     @Autowired
