@@ -34,4 +34,13 @@ public class CorsConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("https://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .exposedHeaders("Authorization")
+                .allowCredentials(true);
+    }
 }
