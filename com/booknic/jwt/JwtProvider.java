@@ -16,7 +16,7 @@ import java.util.Date;
 @Service
 public class JwtProvider {
     private final JwtProperties jwtProperty;
-    private final SecretKey secretKey;
+    private static SecretKey secretKey;
 
     public static final String HEADER_AUTHORIZATION = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
@@ -58,7 +58,7 @@ public class JwtProvider {
         }
         return true;
     }
-    private Claims parseClaims(String token){
+    private static Claims parseClaims(String token){
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
@@ -74,7 +74,7 @@ public class JwtProvider {
         }
         return generateAccessToken(extractUserInfo(refreshToken));
     }
-    private String getId(String token, boolean expirationCheck){
+    public static String getId(String token, boolean expirationCheck){
         try{
             return getId(parseClaims(token));
         }catch (ExpiredJwtException e){
@@ -82,7 +82,7 @@ public class JwtProvider {
             else return getId(e.getClaims());
         }
     }
-    private String getId(Claims payload){
+    private static String getId(Claims payload){
         return (String) payload.get("id");
     }
     public User extractUserInfo(String token){
