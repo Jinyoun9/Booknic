@@ -1,12 +1,10 @@
 package com.booknic.entity;
 
 
-import io.jsonwebtoken.ClaimsMutator;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,10 +15,14 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int mid;
+    private int uid;
     private String id;
     private String password;
     private String name;
-    private String bookname;
+    private String gender;
+    private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Favoritebook> favoriteBooksList;
 
 }
