@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/area")
-@CrossOrigin(origins = "https://localhost:3000")
+@CrossOrigin(origins = "https://localhost:3000/")
 @RequiredArgsConstructor
 public class AreaController {
 

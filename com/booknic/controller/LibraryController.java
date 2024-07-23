@@ -113,7 +113,7 @@ public class LibraryController {
         List<?> libInfo = LibraryService.getLibInfo(params, MONTHLYKEYWORDS.getEndPoint());
         return ResponseEntity.ok().body(libInfo);
     }
-    @GetMapping("/scan")
+    /*@GetMapping("/scan")
     public ResponseEntity<?> getUserLikeScannedBook(@RequestParam Map<String, String> params) throws URISyntaxException {
         String encodedBookname = params.get("bookname");
         String decodedBookname;
@@ -125,5 +125,5 @@ public class LibraryController {
         List<User> userList = userRepository.findUsersByBookname(decodedBookname);
 
         return ResponseEntity.ok(userList);
-    }
+    }*/
 }
