@@ -21,4 +21,8 @@ public class AuthService {
         }
         return false;
     }
+    public User getUser(String id){
+        return userRepository.findUserById(id);
+    }
+
 }
