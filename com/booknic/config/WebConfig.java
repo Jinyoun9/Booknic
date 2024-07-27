@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authCheckInterceptor)
                 .order(2)
                 .addPathPatterns("/user")
-                .excludePathPatterns("/auth/login", "/register/*", "/auth/jwts", "/area", "/area/*");
+                .excludePathPatterns("/auth/login", "/register/*", "/auth/jwts", "/area", "/area/*", "/book/*");
 
         registry.addInterceptor(loginSuccessInterceptor)
                 .order(3)
