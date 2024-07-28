@@ -4,6 +4,9 @@ package com.booknic.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -16,7 +19,7 @@ public class Loan {
     private int lid;
     private String name;
     private String bookname;
-    private String duedate;
+    private LocalDate duedate;
     private String library;
     @ManyToOne
     @JoinColumn(name = "uid")
