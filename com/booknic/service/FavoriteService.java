@@ -1,23 +1,25 @@
 package com.booknic.service;
 
-import com.booknic.dto.BookDto;
+import com.booknic.dto.FavoritebookDto;
 import com.booknic.entity.Favoritebook;
 import com.booknic.entity.User;
 import com.booknic.repository.FavoriteRepository;
+import com.booknic.assembler.BookAssembler;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 public class FavoriteService {
     @Autowired
-    FavoriteRepository favoriteRepository;
+    private FavoriteRepository favoriteRepository;
+    @Autowired
+    private BookAssembler bookAssembler;
     public Favoritebook buildFavoriteBook(String bookname, String library, User user){
         return Favoritebook.builder()
                 .bookname(bookname)
@@ -34,16 +36,15 @@ public class FavoriteService {
         favoriteRepository.deleteFavoriteBookByUserAndBooknameAndLibrary(user, bookname, library);
     }
     @Transactional
-    public List<BookDto> getFavoriteBooks(User user){
+    public List<FavoritebookDto> getFavoriteBooks(User user){
         List<Favoritebook> favoritebookList = favoriteRepository.findFavoritebooksByUser(user);
-        List<BookDto>bookDtoList =  new ArrayList<>();
+        List<FavoritebookDto> favoritebookDtoList =  new ArrayList<>();
+
         for (Favoritebook favoritebook : favoritebookList){
-            bookDtoList.add(BookDto.builder()
-                    .bookname(favoritebook.getBookname())
-                    .library(favoritebook.getLibrary())
-                    .build());
+            FavoritebookDto favoritebookDto = bookAssembler.toDto(favoritebook);
+            favoritebookDtoList.add(favoritebookDto);
         }
-        return bookDtoList;
+        return favoritebookDtoList;
     }
     public List<User> findUsersByFavoriteBook(String bookname, String library) {
         return favoriteRepository.findDistinctUsersByBooknameAndLibrary(bookname, library);
