@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDto {
+public class FavoritebookDto {
     String bookname;
     String library;
 }
