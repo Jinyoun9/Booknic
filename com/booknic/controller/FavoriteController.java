@@ -1,10 +1,7 @@
 package com.booknic.controller;
 
-import com.booknic.dto.BookDto;
-import com.booknic.entity.Favoritebook;
+import com.booknic.dto.FavoritebookDto;
 import com.booknic.entity.User;
-import com.booknic.repository.FavoriteRepository;
-import com.booknic.repository.UserRepository;
 import com.booknic.service.AuthService;
 import com.booknic.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +13,6 @@ import com.booknic.jwt.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "https://localhost:3000")
@@ -24,9 +20,9 @@ import java.util.Optional;
 @RequestMapping("/fav")
 public class FavoriteController {
     @Autowired
-    FavoriteService favoriteService;
+    private final FavoriteService favoriteService;
     @Autowired
-    AuthService authService;
+    private final AuthService authService;
     @PostMapping("/register")
     public ResponseEntity<?> toggleFavorite(@RequestHeader("Authorization") String token, @RequestBody Map<String, String> params) {
         try {
@@ -51,7 +47,7 @@ public class FavoriteController {
         try{
             String id = JwtProvider.getId(token, true);
             User user = authService.getUser(id);
-            List<BookDto> favoritebookList = favoriteService.getFavoriteBooks(user);
+            List<FavoritebookDto> favoritebookList = favoriteService.getFavoriteBooks(user);
             return ResponseEntity.ok(favoritebookList);
         }
         catch (Exception e){

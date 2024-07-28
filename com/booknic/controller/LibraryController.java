@@ -113,17 +113,4 @@ public class LibraryController {
         List<?> libInfo = LibraryService.getLibInfo(params, MONTHLYKEYWORDS.getEndPoint());
         return ResponseEntity.ok().body(libInfo);
     }
-    /*@GetMapping("/scan")
-    public ResponseEntity<?> getUserLikeScannedBook(@RequestParam Map<String, String> params) throws URISyntaxException {
-        String encodedBookname = params.get("bookname");
-        String decodedBookname;
-        try {
-            decodedBookname = URLDecoder.decode(encodedBookname, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return ResponseEntity.badRequest().body("Failed to decode bookname");
-        }
-        List<User> userList = userRepository.findUsersByBookname(decodedBookname);
-
-        return ResponseEntity.ok(userList);
-    }*/
 }

@@ -1,11 +1,8 @@
 package com.booknic.controller;
 
-import com.booknic.entity.User;
 import com.booknic.jwt.JwtProvider;
-import com.booknic.repository.UserRepository;
 import com.booknic.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

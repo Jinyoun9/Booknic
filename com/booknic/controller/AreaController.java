@@ -16,7 +16,7 @@ import java.util.List;
 public class AreaController {
 
     @Autowired
-    AreaRepository areaRepository;
+    private final AreaRepository areaRepository;
 
     @GetMapping
     public ResponseEntity<?> getArea(){
