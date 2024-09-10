@@ -1,9 +1,11 @@
 package com.booknic.service;
 
+import com.booknic.entity.Book;
 import com.booknic.entity.Loan;
 import com.booknic.entity.User;
 import com.booknic.handler.BookEventWebSocketHandler;
 import com.booknic.jwt.JwtProvider;
+import com.booknic.repository.BookRepository;
 import com.booknic.repository.FavoriteRepository;
 import com.booknic.repository.LoanRepository;
 import com.booknic.repository.UserRepository;
@@ -13,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -29,18 +29,20 @@ public class BookService {
     private LoanRepository loanRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
     public BookService(@Lazy BookEventWebSocketHandler webSocketHandler) {
         this.webSocketHandler = webSocketHandler;
     }
     LocalDate localDate = LocalDate.now();
 
-    public void returnBook(String bookname, String library) {
-        List<User> userList = favoriteRepository.findDistinctUsersByBooknameAndLibrary(bookname, library);
+    public void returnBook(String isbn, String library) {
+        List<User> userList = favoriteRepository.findDistinctUsersByIsbnAndLibrary(isbn, library);
         System.out.println(userList.size());
-        webSocketHandler.sendNotification(bookname, userList);
+        webSocketHandler.sendBookReturn(isbn, userList);
     }
 
-    public void loanBook(String bookname, String library, String token) {
+    public void loanBook(String bookname, String library, String token, String isbn) {
         User user = userRepository.findUserById(JwtProvider.getId(token, true));
         LocalDate dueDate = localDate.plusWeeks(2);
         Loan newLoan = Loan.builder()
@@ -49,8 +51,13 @@ public class BookService {
                 .duedate(dueDate)
                 .name(user.getName())
                 .user(user)
+                .isbn(isbn)
                 .build();
         loanRepository.save(newLoan);
+    }
+    public Integer fetchRemain(String isbn, String library) {
+        Book book = bookRepository.findDistinctBookByIsbnAndLibrary(isbn, library);
+        return book != null ? book.getRemain() : null;
     }
 
 }

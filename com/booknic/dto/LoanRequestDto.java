@@ -8,8 +8,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoritebookDto {
-    private String bookname;
+public class LoanRequestDto {
+    private String name;
     private String library;
-    private String isbn;
+    private String isbn13;
 }

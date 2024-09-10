@@ -1,17 +1,19 @@
 package com.booknic.jwt;
 
+import com.booknic.entity.Admin;
+import com.booknic.entity.JwtSubject;
 import com.booknic.entity.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.InvalidClaimException;
-import io.jsonwebtoken.Jwts;
+import com.booknic.repository.AdminRepository;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.file.InvalidPathException;
 import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class JwtProvider {
@@ -21,7 +23,9 @@ public class JwtProvider {
     public static final String HEADER_AUTHORIZATION = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
-    public static final String REDIRECT_PATH = "/articles";
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     public JwtProvider(JwtProperties jwtProperty) {
         this.jwtProperty = jwtProperty;
@@ -33,22 +37,27 @@ public class JwtProvider {
         }
         return null;
     }
-    public String generateToken(User user, Long expiration){
-        return Jwts.builder()
+    public String generateToken(JwtSubject subject, Long expiration, String role){
+        JwtBuilder jwtBuilder = Jwts.builder()
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .issuer(jwtProperty.getIssuer())
-                .subject(user.getId())
+                .subject(subject.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration * 1000))
-                .claim("id", user.getId())
-                .claim("name", user.getName())
-                .compact();
+                .claim("id", subject.getId())
+                .claim("name", subject.getName())
+                .claim("role", role);
+        if(role.equals("staff")){
+            String library = adminRepository.findLibraryByIdAndName(subject.getId(), subject.getName());
+            jwtBuilder.claim("library", library);
+        }
+        return jwtBuilder.compact();
     }
-    public String generateAccessToken(User user){
-        return generateToken(user, jwtProperty.getAccessExpiration());
+    public String generateAccessToken(JwtSubject subject, String role){
+        return generateToken(subject, jwtProperty.getAccessExpiration(), role);
     }
-    public String generateRefreshToken(User user){
-        return generateToken(user, jwtProperty.getRefreshExpiration());
+    public String generateRefreshToken(JwtSubject subject, String role){
+        return generateToken(subject, jwtProperty.getRefreshExpiration(), role);
     }
     public boolean verifyToken(String token){
         try{
@@ -68,11 +77,11 @@ public class JwtProvider {
     public String refreshAccessToken(String accessToken, String refreshToken){
         String fromAccessToken = getId(accessToken, false);
         String fromRefreshToken = getId(refreshToken, true);
-
-        if(fromRefreshToken != fromAccessToken){
+        String role = extractRole(accessToken);
+        if(!Objects.equals(fromRefreshToken, fromAccessToken)){
             throw new IllegalArgumentException("Invalid path detected.");
         }
-        return generateAccessToken(extractUserInfo(refreshToken));
+        return generateAccessToken(extractUserInfo(refreshToken), role);
     }
     public static String getId(String token, boolean expirationCheck){
         try{
@@ -85,9 +94,21 @@ public class JwtProvider {
     private static String getId(Claims payload){
         return (String) payload.get("id");
     }
+    public static String extractRole(String token) {
+        Claims payload = parseClaims(token);
+        return (String) payload.get("role");
+    }
     public User extractUserInfo(String token){
         Claims payload = parseClaims(token);
         return User.builder()
+                .id(getId(payload))
+                .name((String) payload.get("name"))
+                .build();
+
+    }
+    public Admin extractAdminInfo(String token){
+        Claims payload = parseClaims(token);
+        return Admin.builder()
                 .id(getId(payload))
                 .name((String) payload.get("name"))
                 .build();

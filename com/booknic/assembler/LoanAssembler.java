@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoanAssembler {
     public LoanDto toDto(Loan loan) {
-        LoanDto loanDto = new LoanDto();
-        loanDto.setBookname(loan.getBookname());
-        loanDto.setName(loan.getName());
-        loanDto.setDuedate(loan.getDuedate());
-        return loanDto;
+        return LoanDto.builder()
+                .name(loan.getName())
+                .bookname(loan.getBookname())
+                .isbn(loan.getIsbn())
+                .library(loan.getLibrary())
+                .duedate(loan.getDuedate())
+                .build();
     }
 }

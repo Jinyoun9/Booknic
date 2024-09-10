@@ -9,7 +9,7 @@ public class UserInfoHolder {
     public static void setUserInfo(User user) {
         userInfo.set(user);
     }
-
+    public static String getRole() { return "user"; }
     public static User getUserInfo() {
         return userInfo.get();
     }

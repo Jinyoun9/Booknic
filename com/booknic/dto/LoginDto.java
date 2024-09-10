@@ -1,5 +1,6 @@
 package com.booknic.dto;
 
+
 import lombok.*;
 
 @Data
@@ -8,8 +9,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoritebookDto {
-    private String bookname;
-    private String library;
-    private String isbn;
+public class LoginDto {
+    private String id;
+    private String password;
+    private String role;
 }

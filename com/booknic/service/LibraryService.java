@@ -9,6 +9,7 @@ import com.booknic.api.LibApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,21 +23,7 @@ import java.util.Map;
 @Transactional
 public class LibraryService {
 
-    public static List<?> getLibInfo(Integer pageNo, Integer pageSize, String endpoint) throws URISyntaxException {
-
-        StringBuilder reqUrlBuilder = new StringBuilder(endpoint).append("?");
-
-        if (pageNo != null) {
-            reqUrlBuilder.append(PAGENO.getParam()).append(pageNo).append("&");
-        }
-        if (pageSize != null) {
-            reqUrlBuilder.append(PAGESIZE.getParam()).append(pageSize).append("&");
-        }
-
-        String reqUrl = reqUrlBuilder.toString();
-        List<?> libInfos = fetch(reqUrl);
-        return libInfos;
-    }
+    @Cacheable(value = "libInfoCache", key = "#params")
     public static List<?> getLibInfo(Map<String, String> params, String endPoint) throws URISyntaxException {
 
         StringBuilder reqUrlBuilder = new StringBuilder(endPoint).append("?");
@@ -47,6 +34,7 @@ public class LibraryService {
         String endDt = params.get("endDt");
         String keyword = params.get("keyword");
         String searchDt = params.get("searchDt");
+        String isbn13 = params.get("isbn13");
         Integer pageNo = params.get("pageNo") != null ? Integer.valueOf(params.get("pageNo")) : 1;  // 기본 값 1 설정
         Integer pageSize = params.get("pageSize") != null ? Integer.valueOf(params.get("pageSize")) : 10;  // 기본 값 10 설정
         Integer gender = params.get("gender") != null ? Integer.valueOf(params.get("gender")) : null;
@@ -91,6 +79,9 @@ public class LibraryService {
         }
         if (to_age != null) {
             reqUrlBuilder.append(TO_AGE.getParam()).append(to_age).append("&");
+        }
+        if (isbn13 != null) {
+            reqUrlBuilder.append(ISBN13.getParam()).append(isbn13).append("&");
         }
         if (region != null) {
             reqUrlBuilder.append(REGION.getParam()).append(region).append("&");

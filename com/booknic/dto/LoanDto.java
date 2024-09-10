@@ -14,5 +14,7 @@ import java.time.LocalDate;
 public class LoanDto {
     private String bookname;
     private String name;
+    private String library;
     private LocalDate duedate;
+    private String isbn;
 }

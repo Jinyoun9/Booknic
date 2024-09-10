@@ -21,6 +21,7 @@ public class Loan {
     private String bookname;
     private LocalDate duedate;
     private String library;
+    private String isbn;
     @ManyToOne
     @JoinColumn(name = "uid")
     private User user;

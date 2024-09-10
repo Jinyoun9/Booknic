@@ -1,7 +1,10 @@
 package com.booknic.entity;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
@@ -10,14 +13,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Favoritebook {
+public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int fid;
+    private int bid;
     private String bookname;
     private String library;
+    private int remain;
     private String isbn;
-    @ManyToOne
-    @JoinColumn(name = "uid")
-    private User user;
 }

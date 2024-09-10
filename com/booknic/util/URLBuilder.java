@@ -31,8 +31,6 @@ public class URLBuilder {
         sbf.append(AUTHKEY.getParam());
         sbf.append("&");
         sbf.append(FORMAT.getParam());
-
-        System.out.println(sbf.toString());
         return sbf.toString();
     }
 

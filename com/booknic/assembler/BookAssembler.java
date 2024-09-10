@@ -12,6 +12,7 @@ public class BookAssembler {
         return FavoritebookDto.builder()
                 .bookname(favoritebook.getBookname())
                 .library(favoritebook.getLibrary())
+                .isbn(favoritebook.getIsbn())
                 .build();
     }
 }

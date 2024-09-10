@@ -1,6 +1,7 @@
 package com.booknic.entity;
 
 
+import io.jsonwebtoken.Jwt;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements JwtSubject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int uid;

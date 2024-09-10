@@ -16,7 +16,7 @@ import java.util.List;
 public class AreaController {
 
     @Autowired
-    private final AreaRepository areaRepository;
+    private AreaRepository areaRepository;
 
     @GetMapping
     public ResponseEntity<?> getArea(){
@@ -24,8 +24,8 @@ public class AreaController {
         return ResponseEntity.ok(resAreaInfo);
     }
     @GetMapping("/detail")
-    public ResponseEntity<?> getDetailArea(@RequestParam(name = "name", required = true) String name,
-                                           @RequestParam(name = "code", required = true) Integer code) throws URISyntaxException{
+    public ResponseEntity<?> getDetailArea(@RequestParam(name = "name") String name,
+                                           @RequestParam(name = "code") Integer code) throws URISyntaxException{
         List<?>resAreaInfo = areaRepository.findByNameAndCode(name, code);
         List<?> filteredList = resAreaInfo.subList(1, resAreaInfo.size());
         return ResponseEntity.ok(filteredList);

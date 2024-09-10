@@ -10,5 +10,7 @@ import java.util.List;
 public interface LoanRepository extends JpaRepository<Loan, String> {
 
     List<Loan> findLoansByDuedateBeforeAndLibrary(LocalDate duedate, String library);
-    Loan findLoanByUserAndLibraryAndBookname(User user, String library, String bookname);
+    List<Loan> findLoansByLibrary(String library);
+    Loan findDistinctLoanByNameAndLibraryAndIsbn(String name, String library, String isbn);
+
 }

@@ -1,10 +1,15 @@
 package com.booknic.controller;
 
+import com.booknic.dto.RegisterDto;
 import com.booknic.entity.User;
 import com.booknic.repository.UserRepository;
+import com.booknic.result.RegisterResult;
+import com.booknic.service.EmailService;
+import com.booknic.service.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -18,44 +23,31 @@ import java.util.Map;
 @RequestMapping("/register")
 public class RegisterController {
     @Autowired
-    UserRepository userRepository;
-    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private EmailService emailService;
+    @Autowired
+    private RegisterService registerService;
 
     @GetMapping("/checkid")
-    public Map<String, Boolean> checkIdAvailability(@RequestParam String id){
-        boolean idAvailable = userRepository.existsById(id);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("available", idAvailable);
-        return response;
+    public Boolean checkIdAvailability(@RequestParam String id, @RequestParam String role){
+        return registerService.fetchExistById(id, role);
     }
     @GetMapping("/checkemail")
-    public Map<String, Boolean> checkEmailAvailability(@RequestParam String email){
-        boolean emailAvailable = userRepository.existsByEmail(email);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("available", emailAvailable);
-        return response;
+    public Boolean checkEmailAvailability(@RequestParam String email, @RequestParam String role){
+        return registerService.fetchExistByEmail(email, role);
     }
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody Map<String, String> params){
-        User user = new User();
+    public ResponseEntity<?> signup(@RequestBody RegisterDto params) {
+        RegisterResult signUpRes = registerService.trySignUp(params);
+        return switch (signUpRes.getStatus()) {
+            case "SUCCESS_USER", "SUCCESS_ADMIN" -> ResponseEntity.ok().body(signUpRes.getMessage());
+            case "ID_ALREADY_EXISTS", "EMAIL_ALREADY_EXISTS" ->
+                    ResponseEntity.status(HttpStatus.CONFLICT).body(signUpRes.getMessage());
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(signUpRes.getMessage());
+        };
+    }
 
-        String id = params.get("id");
-        String encodedPW = encoder.encode(params.get("password"));
-        String name = params.get("username");
-        String gender = params.get("gender");
-        String email = params.get("email");
-
-        if(!userRepository.existsByEmail(email) && !userRepository.existsById(id)){
-            user.setId(id);
-            user.setPassword(encodedPW);
-            user.setName(name);
-            user.setGender(gender);
-            user.setEmail(email);
-            userRepository.save(user);
-            return ResponseEntity.ok().build();
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("false");
-        }
+    @PostMapping("/mailConfirm")
+    public String mailConfirm(@RequestBody Map<String, String> emailInfo) throws Exception {
+        return emailService.sendSimpleMessage(emailInfo);
     }
 }

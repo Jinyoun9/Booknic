@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class JwtAuthCheckInterceptor implements AuthCheckInterceptor{
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(UserInfoHolder.isEmpty()){
+        if(UserInfoHolder.isEmpty() || AdminInfoHolder.isEmpty()){
             throw new IllegalArgumentException("Unauthorized Access");
         }
         return true;

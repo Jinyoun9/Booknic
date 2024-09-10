@@ -2,11 +2,13 @@ package com.booknic.controller;
 
 
 import com.booknic.dto.LoanDto;
+import com.booknic.dto.LoanRequestDto;
 import com.booknic.entity.Loan;
 import com.booknic.entity.User;
 import com.booknic.repository.LoanRepository;
 import com.booknic.repository.UserRepository;
 import com.booknic.service.AdminService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,25 +23,30 @@ import java.util.Map;
 @RequestMapping("/admin")
 public class AdminController {
     @Autowired
-    private final AdminService adminService;
+    private AdminService adminService;
     @Autowired
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    private final LoanRepository loanRepository;
+    private LoanRepository loanRepository;
 
+    @GetMapping("/getloan")
+    public ResponseEntity<?> getLoan(@RequestHeader("Authorization") String token, @RequestParam String library){
+        List<LoanDto> loanInfos = adminService.fetchLoanDtos(library);
+        return ResponseEntity.ok().body(loanInfos);
+    }
     @GetMapping("/overdue")
-    public ResponseEntity<?> getOverdueUser(/*@RequestHeader("Authorization") String token,*/ @RequestParam Map<String, String> params){
-        String library = params.get("library");
-        List<LoanDto> loanDtoList = adminService.fetchOverdueUser(library);
-        return ResponseEntity.ok().body(loanDtoList);
+    public ResponseEntity<?> getOverdueUser(@RequestHeader("Authorization") String token, @RequestParam String library){
+        List<LoanDto> overDueUsers = adminService.fetchOverdueUser(library);
+        return ResponseEntity.ok().body(overDueUsers);
     }
     @PutMapping("/extenddue")
-    public void updateDuedate(/*@RequestHeader("Authorization") String token,*/ @RequestParam Map<String, String> params){
-        User user = userRepository.findUserById(params.get("id"));
-        String library = params.get("library");
-        String bookname = params.get("bookname");
+    @Transactional
+    public void updateDuedate(@RequestHeader("Authorization") String token, @RequestBody LoanRequestDto params){
+        User user = userRepository.findUserByName(params.getName());
+        String library = params.getLibrary();
+        String isbn = params.getIsbn13();
 
-        Loan updateLoan = adminService.editDuedate(user, library, bookname);
+        Loan updateLoan = adminService.editDuedate(user, library, isbn);
         loanRepository.save(updateLoan);
     }
 }
